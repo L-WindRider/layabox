@@ -8,10 +8,12 @@
 			//初始化引擎
 			//不支持WebGL时自动切换至Canvas
 			Laya.init(1200, 800,WebGL);
-			Laya.stage.bgColor = "#efefef";//设置画布的背景颜色
+			Laya.stage.bgColor = "#FF9800";//设置画布的背景颜色
 			
 			basics_align();//启动基础and对齐自动换行设置
+			setup();//启动overflow检测
 		}
+/*********************文本设置********************************/
 		private function basics_align():void{
 			var txt:Text = new Text();
 			txt.text = "Hello_world";//文本内容
@@ -28,9 +30,40 @@
 			txt.width = 600;//文本宽度
 			txt.height = 100;//文本高度
 			txt.x = 100;//设置 txt 对象的属性 x 的值，用于控制 txt 对象的显示位置。
-			txt.y = 100;//设置 txt 对象的属性 y 的值，用于控制 txt 对象的显示位置。
+			txt.y = 20;//设置 txt 对象的属性 y 的值，用于控制 txt 对象的显示位置。
 			Laya.stage.addChild(txt);//加载到舞台上
 			
+		}
+/*********************overflow设置********************************/
+		private function setup():void{
+			var t1:Text = createText();
+			//设置不进行剪裁
+			t1.pos(10, 10);
+			t1.y = 150;//设置 t1 对象的属性 y 的值，用于控制 t1 对象的显示位置。
+			var t2:Text = createText();
+			//设置不显示文本区域外的字符
+			t2.overflow = Text.VISIBLE;
+			t2.pos(10, 110);
+			t2.y = 220;//设置 t2 对象的属性 y 的值，用于控制 t2 对象的显示位置。
+			var t3 = createText();
+			//设置不显示超出文本的字符
+			t3.overflow = Text.HIDDEN;
+			t3.pos(10, 100);
+			t3.y = 300;//设置 t2 对象的属性 y 的值，用于控制 t3 对象的显示位置。
+		}
+		private function createText():Text{
+			var txt:Text = new Text();
+			txt.text =
+			 "Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！\n" +
+             "Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！\n" +
+             "Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！"; 
+			txt.borderColor = "#FFFF00";
+			//设置宽高以后自动剪裁会按照这个区域剪裁
+			txt.size(300, 50);
+			txt.fontSize = 20;
+			txt.color = "#FFFFFF";
+			Laya.stage.addChild(txt);
+			return txt;
 		}
 		
 	}
