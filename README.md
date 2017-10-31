@@ -6,5 +6,3 @@ layabox学习
 >>>textStyle //文本样式
    包括基本样式的设置，对齐方式，overflow设置，单/多行输入
    
-##textStyle
- 包括基本样式的设置，对齐方式，overflow设置，单/多行输入
