@@ -77,8 +77,8 @@ package laya.webgl.atlas {
 				_InAtlasWebGLImagesKey[sUrl?sUrl:webImage.id] = {bitmap:mergeAtlasBitmap,offsetInfoID:_InAtlasWebGLImagesOffsetValue.length};
 				_InAtlasWebGLImagesOffsetValue.push([offsetX, offsetY]);
 			}
-			//if (bitmap is  WebGLSubImage)//临时
-			//_atlasCanvas.texSubImage2DPixel(bitmap, offsetX,/* width, height, AtlasManager.BOARDER_TYPE_ALL, 1, 1*/ offsetY,bitmap.width,bitmap.height, bitmap.imageData);
+			//if (textBitmap is  WebGLSubImage)//临时
+			//_atlasCanvas.texSubImage2DPixel(textBitmap, offsetX,/* width, height, AtlasManager.BOARDER_TYPE_ALL, 1, 1*/ offsetY,textBitmap.width,textBitmap.height, textBitmap.imageData);
 			//else
 			_atlasCanvas.texSubImage2D(offsetX,/* width, height, AtlasManager.BOARDER_TYPE_ALL, 1, 1*/ offsetY, mergeAtlasBitmap.atlasSource);
 			mergeAtlasBitmap.clearAtlasSource();
@@ -103,7 +103,7 @@ package laya.webgl.atlas {
 				_inAtlasTextureKey[i]._atlasID = -1;
 				_inAtlasTextureKey[i].bitmap.lock = false;//解锁资源
 				_inAtlasTextureKey[i].bitmap.releaseResource();
-				//_inAtlasTextureKey[i].bitmap.lock = false;//重新加锁
+				//_inAtlasTextureKey[i].textBitmap.lock = false;//重新加锁
 			}
 			_inAtlasTextureKey.length = 0;
 			_inAtlasTextureBitmapValue.length = 0;

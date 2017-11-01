@@ -312,7 +312,7 @@ package laya.renders {
 				return;
 			}
 			
-			_cacheCanvas.type === 'bitmap' ? (Stat.canvasBitmap++) : (Stat.canvasNormal++);
+			_cacheCanvas.type === 'textBitmap' ? (Stat.canvasBitmap++) : (Stat.canvasNormal++);
 			var tx:RenderContext = _cacheCanvas.ctx;
 			
 			if (sprite._needRepaint() || !tx)
@@ -342,12 +342,12 @@ package laya.renders {
 			var tRec:Rectangle;
 			var tCacheType:String = _cacheCanvas.type;
 			
-			tCacheType === 'bitmap' ? (Stat.canvasBitmap++) : (Stat.canvasNormal++);
+			tCacheType === 'textBitmap' ? (Stat.canvasBitmap++) : (Stat.canvasNormal++);
 			if (_repaint) {
 				if (!_cacheCanvas._cacheRec)
 					_cacheCanvas._cacheRec = new Rectangle();
 				var w:Number, h:Number;
-				if (!Render.isWebGL || tCacheType === "bitmap")
+				if (!Render.isWebGL || tCacheType === "textBitmap")
 				{
 					tRec = sprite.getSelfBounds();
 					tRec.x = tRec.x - sprite.pivotX;				
@@ -370,7 +370,7 @@ package laya.renders {
 				var scaleX:Number = Render.isWebGL ? 1 : Browser.pixelRatio * Laya.stage.clientScaleX;
 				var scaleY:Number = Render.isWebGL ? 1 : Browser.pixelRatio * Laya.stage.clientScaleY;
 				
-				if (!Render.isWebGL) {//||_cacheCanvas.type === 'bitmap'
+				if (!Render.isWebGL) {//||_cacheCanvas.type === 'textBitmap'
 					var chainScaleX:Number = 1;
 					var chainScaleY:Number = 1;
 					var tar:Sprite;
@@ -400,8 +400,8 @@ package laya.renders {
 				left = tRec.x;
 				top = tRec.y;
 				
-				if (Render.isWebGL && tCacheType === 'bitmap' && (w > 2048 || h > 2048)) {
-					console.warn("cache bitmap size larger than 2048,cache ignored");
+				if (Render.isWebGL && tCacheType === 'textBitmap' && (w > 2048 || h > 2048)) {
+					console.warn("cache textBitmap size larger than 2048,cache ignored");
 					if (_cacheCanvas.ctx) {
 						Pool.recover("RenderContext", _cacheCanvas.ctx);
 						_cacheCanvas.ctx.canvas.size(0, 0);
@@ -419,7 +419,7 @@ package laya.renders {
 				canvas = tx.canvas;
 				canvas.clear();
 				(canvas.width != w || canvas.height != h) && canvas.size(w, h);
-				if (tCacheType === 'bitmap') canvas.context.asBitmap = true;
+				if (tCacheType === 'textBitmap') canvas.context.asBitmap = true;
 				else if(tCacheType === 'normal')canvas.context.asBitmap = false;
 				
 				var t:*;

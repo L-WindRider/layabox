@@ -2,6 +2,7 @@
 	import laya.display.Text;
 	import laya.display.Stage;
 	import laya.events.Event;
+	import laya.ui.TextInput;
 	import laya.utils.Browser;
 	import laya.webgl.WebGL;
 	public class LayaSample {
@@ -16,6 +17,8 @@
 			
 			basics_align();//启动基础and对齐自动换行设置
 			setup();//启动overflow检测
+			Text_InputSingleline ();//单行输入
+			Text_InputMultiline();//多行输入
 		}
 /*********************文本设置********************************/
 		private function basics_align():void{
@@ -97,6 +100,31 @@
             txt.scrollY += prevY - nowY;
             prevX = nowX;
             prevY = nowY;
+		}
+/**********************textInput单行输入and多行输入********************************/
+
+        private function Text_InputSingleline():void{
+			var textInput:TextInput = new TextInput("单行输入");//创建一个textInput类的实例对象 textInput。
+			textInput.wordWrap = true;//设置textInput 的文本自动换行
+			textInput.fontSize = 30;//设置 textinput的字体大小
+			textInput.x = 0;
+			textInput.y = 500;
+			textInput.width = 300;
+			textInput.height = 200;
+			textInput.bgColor = "#c30c30";
+			Laya.stage.addChild(textInput);
+		}
+		private function Text_InputMultiline():void{
+			var textInput:TextInput = new TextInput("多行输入");
+			textInput.wordWrap = true;
+			textInput.multiline = true;//设置textInput多行输入
+			textInput.fontSize = 30;
+			textInput.x = 0;
+			textInput.y = 720;
+			textInput.width = 300;
+			textInput.height = 200;
+			textInput.bgColor = "#c30c30";
+			Laya.stage.addChild(textInput);
 		}
 		
 	}

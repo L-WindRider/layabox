@@ -197,6 +197,7 @@ var Laya=window.Laya=(function(window,document){
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 	Laya.interface('laya.d3.core.IClone');
 	Laya.interface('laya.runtime.IMarket');
+	Laya.interface('laya.filters.IFilter');
 	Laya.interface('laya.display.ILayout');
 	Laya.interface('laya.resource.IDispose');
 	Laya.interface('laya.runtime.IConchNode');
@@ -294,6 +295,8 @@ var Laya=window.Laya=(function(window,document){
 			Laya.stage.bgColor="#FF9800";
 			this.basics_align();
 			this.setup();
+			this.Text_InputSingleline ();
+			this.Text_InputMultiline();
 		}
 
 		__class(LayaSample,'LayaSample');
@@ -375,6 +378,32 @@ var Laya=window.Laya=(function(window,document){
 			this.txt.scrollY+=this.prevY-nowY;
 			this.prevX=nowX;
 			this.prevY=nowY;
+		}
+
+		/**********************textInput单行输入and多行输入********************************/
+		__proto.Text_InputSingleline=function(){
+			var textInput=new TextInput("单行输入");
+			textInput.wordWrap=true;
+			textInput.fontSize=30;
+			textInput.x=0;
+			textInput.y=500;
+			textInput.width=300;
+			textInput.height=200;
+			textInput.bgColor="#c30c30";
+			Laya.stage.addChild(textInput);
+		}
+
+		__proto.Text_InputMultiline=function(){
+			var textInput=new TextInput("多行输入");
+			textInput.wordWrap=true;
+			textInput.multiline=true;
+			textInput.fontSize=30;
+			textInput.x=0;
+			textInput.y=720;
+			textInput.width=300;
+			textInput.height=200;
+			textInput.bgColor="#c30c30";
+			Laya.stage.addChild(textInput);
 		}
 
 		return LayaSample;
@@ -5487,7 +5516,7 @@ var Laya=window.Laya=(function(window,document){
 				left=tRec.x;
 				top=tRec.y;
 				if (Render.isWebGL && tCacheType==='bitmap' && (w > 2048 || h > 2048)){
-					console.warn("cache bitmap size larger than 2048,cache ignored");
+					console.warn("cache textBitmap size larger than 2048,cache ignored");
 					if (_cacheCanvas.ctx){
 						Pool.recover("RenderContext",_cacheCanvas.ctx);
 						_cacheCanvas.ctx.canvas.size(0,0);
@@ -6225,6 +6254,105 @@ var Laya=window.Laya=(function(window,document){
 		}
 
 		return System;
+	})()
+
+
+	//class laya.ui.LayoutStyle
+	var LayoutStyle=(function(){
+		function LayoutStyle(){
+			this.enable=false;
+			this.top=NaN;
+			this.bottom=NaN;
+			this.left=NaN;
+			this.right=NaN;
+			this.centerX=NaN;
+			this.centerY=NaN;
+			this.anchorX=NaN;
+			this.anchorY=NaN;
+		}
+
+		__class(LayoutStyle,'laya.ui.LayoutStyle');
+		__static(LayoutStyle,
+		['EMPTY',function(){return this.EMPTY=new LayoutStyle();}
+		]);
+		return LayoutStyle;
+	})()
+
+
+	//class laya.ui.Styles
+	var Styles=(function(){
+		function Styles(){};
+		__class(Styles,'laya.ui.Styles');
+		Styles.labelColor="#000000";
+		Styles.buttonStateNum=3;
+		Styles.scrollBarMinNum=15;
+		Styles.scrollBarDelayTime=500;
+		__static(Styles,
+		['defaultSizeGrid',function(){return this.defaultSizeGrid=[4,4,4,4,0];},'labelPadding',function(){return this.labelPadding=[2,2,2,2];},'inputLabelPadding',function(){return this.inputLabelPadding=[1,1,1,3];},'buttonLabelColors',function(){return this.buttonLabelColors=["#32556b","#32cc6b","#ff0000","#C0C0C0"];},'comboBoxItemColors',function(){return this.comboBoxItemColors=["#5e95b6","#ffffff","#000000","#8fa4b1","#ffffff"];}
+		]);
+		return Styles;
+	})()
+
+
+	//class laya.ui.UIUtils
+	var UIUtils=(function(){
+		function UIUtils(){};
+		__class(UIUtils,'laya.ui.UIUtils');
+		UIUtils.fillArray=function(arr,str,type){
+			var temp=arr.concat();
+			if (str){
+				var a=str.split(",");
+				for (var i=0,n=Math.min(temp.length,a.length);i < n;i++){
+					var value=a[i];
+					temp[i]=(value=="true" ? true :(value=="false" ? false :value));
+					if (type !=null)temp[i]=type(value);
+				}
+			}
+			return temp;
+		}
+
+		UIUtils.toColor=function(color){
+			return Utils.toHexColor(color);
+		}
+
+		UIUtils.gray=function(traget,isGray){
+			(isGray===void 0)&& (isGray=true);
+			if (isGray){
+				UIUtils.addFilter(traget,UIUtils.grayFilter);
+				}else {
+				UIUtils.clearFilter(traget,ColorFilter);
+			}
+		}
+
+		UIUtils.addFilter=function(target,filter){
+			var filters=target.filters || [];
+			filters.push(filter);
+			target.filters=filters;
+		}
+
+		UIUtils.clearFilter=function(target,filterType){
+			var filters=target.filters;
+			if (filters !=null && filters.length > 0){
+				for (var i=filters.length-1;i >-1;i--){
+					var filter=filters[i];
+					if (Laya.__typeof(filter,filterType))filters.splice(i,1);
+				}
+				target.filters=filters;
+			}
+		}
+
+		UIUtils._getReplaceStr=function(word){
+			return UIUtils.escapeSequence[word];
+		}
+
+		UIUtils.adptString=function(str){
+			return str.replace(/\\(\w)/g,UIUtils._getReplaceStr);
+		}
+
+		__static(UIUtils,
+		['grayFilter',function(){return this.grayFilter=new ColorFilter([0.3086,0.6094,0.082,0,0,0.3086,0.6094,0.082,0,0,0.3086,0.6094,0.082,0,0,0,0,0,1,0]);},'escapeSequence',function(){return this.escapeSequence={"\\n":"\n","\\t":"\t"};}
+		]);
+		return UIUtils;
 	})()
 
 
@@ -15433,7 +15561,7 @@ var Laya=window.Laya=(function(window,document){
 	//class laya.resource.Texture extends laya.events.EventDispatcher
 	var Texture=(function(_super){
 		function Texture(bitmap,uv){
-			//this.bitmap=null;
+			//this.textBitmap=null;
 			//this.uv=null;
 			this.offsetX=0;
 			this.offsetY=0;
@@ -15717,6 +15845,204 @@ var Laya=window.Laya=(function(window,document){
 		Texture._rect2=new Rectangle();
 		return Texture;
 	})(EventDispatcher)
+
+
+	//class laya.ui.AutoBitmap extends laya.display.Graphics
+	var AutoBitmap=(function(_super){
+		function AutoBitmap(){
+			this.autoCacheCmd=true;
+			this._width=0;
+			this._height=0;
+			this._source=null;
+			this._sizeGrid=null;
+			this._isChanged=false;
+			this._offset=null;
+			AutoBitmap.__super.call(this);
+		}
+
+		__class(AutoBitmap,'laya.ui.AutoBitmap',_super);
+		var __proto=AutoBitmap.prototype;
+		/**@inheritDoc */
+		__proto.destroy=function(){
+			_super.prototype.destroy.call(this);
+			this._source=null;
+			this._sizeGrid=null;
+			this._offset=null;
+		}
+
+		/**@private */
+		__proto._setChanged=function(){
+			if (!this._isChanged){
+				this._isChanged=true;
+				Laya.timer.callLater(this,this.changeSource);
+			}
+		}
+
+		/**
+		*@private
+		*修改纹理资源。
+		*/
+		__proto.changeSource=function(){
+			this._isChanged=false;
+			var source=this._source;
+			if (!source || !source.bitmap)return;
+			var width=this.width;
+			var height=this.height;
+			var sizeGrid=this._sizeGrid;
+			var sw=source.sourceWidth;
+			var sh=source.sourceHeight;
+			if (!sizeGrid || (sw===width && sh===height)){
+				this.cleanByTexture(source,this._offset ? this._offset[0] :0,this._offset ? this._offset[1] :0,width,height);
+				}else {
+				source.$_GID || (source.$_GID=Utils.getGID());
+				var key=source.$_GID+"."+width+"."+height+"."+sizeGrid.join(".");
+				if (WeakObject.I.get(key)){
+					this.cmds=WeakObject.I.get(key);
+					return;
+				}
+				this.clear();
+				var top=sizeGrid[0];
+				var right=sizeGrid[1];
+				var bottom=sizeGrid[2];
+				var left=sizeGrid[3];
+				var repeat=sizeGrid[4];
+				var needClip=false;
+				if (width==sw){
+					left=right=0;
+				}
+				if (height==sh){
+					top=bottom=0;
+				}
+				if (left+right > width){
+					var clipWidth=width;
+					needClip=true;
+					width=left+right;
+				}
+				if (needClip){
+					this.save();
+					this.clipRect(0,0,clipWidth,height);
+				}
+				left && top && this.drawTexture(AutoBitmap.getTexture(source,0,0,left,top),0,0,left,top);
+				right && top && this.drawTexture(AutoBitmap.getTexture(source,sw-right,0,right,top),width-right,0,right,top);
+				left && bottom && this.drawTexture(AutoBitmap.getTexture(source,0,sh-bottom,left,bottom),0,height-bottom,left,bottom);
+				right && bottom && this.drawTexture(AutoBitmap.getTexture(source,sw-right,sh-bottom,right,bottom),width-right,height-bottom,right,bottom);
+				top && this.drawBitmap(repeat,AutoBitmap.getTexture(source,left,0,sw-left-right,top),left,0,width-left-right,top);
+				bottom && this.drawBitmap(repeat,AutoBitmap.getTexture(source,left,sh-bottom,sw-left-right,bottom),left,height-bottom,width-left-right,bottom);
+				left && this.drawBitmap(repeat,AutoBitmap.getTexture(source,0,top,left,sh-top-bottom),0,top,left,height-top-bottom);
+				right && this.drawBitmap(repeat,AutoBitmap.getTexture(source,sw-right,top,right,sh-top-bottom),width-right,top,right,height-top-bottom);
+				this.drawBitmap(repeat,AutoBitmap.getTexture(source,left,top,sw-left-right,sh-top-bottom),left,top,width-left-right,height-top-bottom);
+				if (needClip)this.restore();
+				if (this.autoCacheCmd && !Render.isConchApp)WeakObject.I.set(key,this.cmds);
+			}
+			this._repaint();
+		}
+
+		__proto.drawBitmap=function(repeat,tex,x,y,width,height){
+			(width===void 0)&& (width=0);
+			(height===void 0)&& (height=0);
+			if (width < 0.1 || height < 0.1)return;
+			if (repeat && (tex.width !=width || tex.height !=height))this.fillTexture(tex,x,y,width,height);
+			else this.drawTexture(tex,x,y,width,height);
+		}
+
+		__proto.clear=function(recoverCmds){
+			(recoverCmds===void 0)&& (recoverCmds=true);
+			_super.prototype.clear.call(this,false);
+		}
+
+		/**
+		*当前实例的有效缩放网格数据。
+		*<p>如果设置为null,则在应用任何缩放转换时，将正常缩放整个显示对象。</p>
+		*<p>数据格式：[上边距,右边距,下边距,左边距,是否重复填充(值为0：不重复填充，1：重复填充)]。
+		*<ul><li>例如：[4,4,4,4,1]</li></ul></p>
+		*<p> <code>sizeGrid</code> 的值如下所示：
+		*<ol>
+		*<li>上边距</li>
+		*<li>右边距</li>
+		*<li>下边距</li>
+		*<li>左边距</li>
+		*<li>是否重复填充(值为0：不重复填充，1：重复填充)</li>
+		*</ol></p>
+		*<p>当定义 <code>sizeGrid</code> 属性时，该显示对象被分割到以 <code>sizeGrid</code> 数据中的"上边距,右边距,下边距,左边距" 组成的矩形为基础的具有九个区域的网格中，该矩形定义网格的中心区域。网格的其它八个区域如下所示：
+		*<ul>
+		*<li>矩形上方的区域</li>
+		*<li>矩形外的右上角</li>
+		*<li>矩形左侧的区域</li>
+		*<li>矩形右侧的区域</li>
+		*<li>矩形外的左下角</li>
+		*<li>矩形下方的区域</li>
+		*<li>矩形外的右下角</li>
+		*<li>矩形外的左上角</li>
+		*</ul>
+		*同时也支持3宫格，比如0,4,0,4,1为水平3宫格，4,0,4,0,1为垂直3宫格，3宫格性能比9宫格高。
+		*</p>
+		*/
+		__getset(0,__proto,'sizeGrid',function(){
+			return this._sizeGrid;
+			},function(value){
+			this._sizeGrid=value;
+			this._setChanged();
+		});
+
+		/**
+		*表示显示对象的宽度，以像素为单位。
+		*/
+		__getset(0,__proto,'width',function(){
+			if (this._width)return this._width;
+			if (this._source)return this._source.sourceWidth;
+			return 0;
+			},function(value){
+			if (this._width !=value){
+				this._width=value;
+				this._setChanged();
+			}
+		});
+
+		/**
+		*表示显示对象的高度，以像素为单位。
+		*/
+		__getset(0,__proto,'height',function(){
+			if (this._height)return this._height;
+			if (this._source)return this._source.sourceHeight;
+			return 0;
+			},function(value){
+			if (this._height !=value){
+				this._height=value;
+				this._setChanged();
+			}
+		});
+
+		/**
+		*对象的纹理资源。
+		*@see laya.resource.Texture
+		*/
+		__getset(0,__proto,'source',function(){
+			return this._source;
+			},function(value){
+			if (value){
+				this._source=value
+				this._setChanged();
+				}else {
+				this._source=null;
+				this.clear();
+			}
+		});
+
+		AutoBitmap.getTexture=function(tex,x,y,width,height){
+			if (width <=0)width=1;
+			if (height <=0)height=1;
+			tex.$_GID || (tex.$_GID=Utils.getGID())
+			var key=tex.$_GID+"."+x+"."+y+"."+width+"."+height;
+			var texture=WeakObject.I.get(key);
+			if (!texture){
+				texture=Texture.createFromTexture(tex,x,y,width,height);
+				WeakObject.I.set(key,texture);
+			}
+			return texture;
+		}
+
+		return AutoBitmap;
+	})(Graphics)
 
 
 	//class laya.webgl.display.GraphicsGL extends laya.display.Graphics
@@ -16504,6 +16830,18 @@ var Laya=window.Laya=(function(window,document){
 
 		return ColorFilterActionGL;
 	})(FilterActionGL)
+
+
+	//class laya.ui.UIEvent extends laya.events.Event
+	var UIEvent=(function(_super){
+		function UIEvent(){UIEvent.__super.call(this);;
+		};
+
+		__class(UIEvent,'laya.ui.UIEvent',_super);
+		UIEvent.SHOW_TIP="showtip";
+		UIEvent.HIDE_TIP="hidetip";
+		return UIEvent;
+	})(Event)
 
 
 	//class laya.webgl.shader.d2.value.Value2D extends laya.webgl.shader.ShaderValue
@@ -19584,10 +19922,10 @@ var Laya=window.Laya=(function(window,document){
 
 		/**
 		*<p>指定显示对象是否缓存为静态图像，cacheAs时，子对象发生变化，会自动重新缓存，同时也可以手动调用reCache方法更新缓存。</p>
-		*<p>建议把不经常变化的“复杂内容”缓存为静态图像，能极大提高渲染性能。cacheAs有"none"，"normal"和"bitmap"三个值可选。
+		*<p>建议把不经常变化的“复杂内容”缓存为静态图像，能极大提高渲染性能。cacheAs有"none"，"normal"和"textBitmap"三个值可选。
 		*<li>默认为"none"，不做任何缓存。</li>
 		*<li>当值为"normal"时，canvas模式下进行画布缓存，webgl模式下进行命令缓存。</li>
-		*<li>当值为"bitmap"时，canvas模式下进行依然是画布缓存，webgl模式下使用renderTarget缓存。</li></p>
+		*<li>当值为"textBitmap"时，canvas模式下进行依然是画布缓存，webgl模式下使用renderTarget缓存。</li></p>
 		*<p>webgl下renderTarget缓存模式缺点：会额外创建renderTarget对象，增加内存开销，缓存面积有最大2048限制，不断重绘时会增加CPU开销。优点：大幅减少drawcall，渲染性能最高。
 		*webgl下命令缓存模式缺点：只会减少节点遍历及命令组织，不会减少drawcall数，性能中等。优点：没有额外内存开销，无需renderTarget支持。</p>
 		*/
@@ -21642,6 +21980,489 @@ var Laya=window.Laya=(function(window,document){
 		['_fontFamilyMap',function(){return this._fontFamilyMap={"报隶" :"报隶-简","黑体" :"黑体-简","楷体" :"楷体-简","兰亭黑" :"兰亭黑-简","隶变" :"隶变-简","凌慧体" :"凌慧体-简","翩翩体" :"翩翩体-简","苹方" :"苹方-简","手札体" :"手札体-简","宋体" :"宋体-简","娃娃体" :"娃娃体-简","魏碑" :"魏碑-简","行楷" :"行楷-简","雅痞" :"雅痞-简","圆体" :"圆体-简"};}
 		]);
 		return Text;
+	})(Sprite)
+
+
+	//class laya.ui.Component extends laya.display.Sprite
+	var Component=(function(_super){
+		function Component(){
+			this._comXml=null;
+			this._dataSource=null;
+			this._toolTip=null;
+			this._tag=null;
+			this._disabled=false;
+			this._gray=false;
+			this.layoutEnabled=true;
+			Component.__super.call(this);
+			this._layout=LayoutStyle.EMPTY;
+			this.preinitialize();
+			this.createChildren();
+			this.initialize();
+		}
+
+		__class(Component,'laya.ui.Component',_super);
+		var __proto=Component.prototype;
+		Laya.imps(__proto,{"laya.ui.IComponent":true})
+		/**@inheritDoc */
+		__proto.destroy=function(destroyChild){
+			(destroyChild===void 0)&& (destroyChild=true);
+			_super.prototype.destroy.call(this,destroyChild);
+			this._dataSource=this._layout=null;
+			this._tag=null;
+			this._toolTip=null;
+		}
+
+		/**
+		*<p>预初始化。</p>
+		*@internal 子类可在此函数内设置、修改属性默认值
+		*/
+		__proto.preinitialize=function(){}
+		/**
+		*<p>创建并添加控件子节点。</p>
+		*@internal 子类可在此函数内创建并添加子节点。
+		*/
+		__proto.createChildren=function(){}
+		/**
+		*<p>控件初始化。</p>
+		*@internal 在此子对象已被创建，可以对子对象进行修改。
+		*/
+		__proto.initialize=function(){}
+		/**
+		*<p>延迟运行指定的函数。</p>
+		*<p>在控件被显示在屏幕之前调用，一般用于延迟计算数据。</p>
+		*@param method 要执行的函数的名称。例如，functionName。
+		*@param args 传递给 <code>method</code> 函数的可选参数列表。
+		*
+		*@see #runCallLater()
+		*/
+		__proto.callLater=function(method,args){
+			Laya.timer.callLater(this,method,args);
+		}
+
+		/**
+		*<p>如果有需要延迟调用的函数（通过 <code>callLater</code> 函数设置），则立即执行延迟调用函数。</p>
+		*@param method 要执行的函数名称。例如，functionName。
+		*@see #callLater()
+		*/
+		__proto.runCallLater=function(method){
+			Laya.timer.runCallLater(this,method);
+		}
+
+		/**
+		*<p>立即执行影响宽高度量的延迟调用函数。</p>
+		*@internal <p>使用 <code>runCallLater</code> 函数，立即执行影响宽高度量的延迟运行函数(使用 <code>callLater</code> 设置延迟执行函数)。</p>
+		*@see #callLater()
+		*@see #runCallLater()
+		*/
+		__proto.commitMeasure=function(){}
+		/**
+		*<p>重新调整对象的大小。</p>
+		*/
+		__proto.changeSize=function(){
+			this.event("resize");
+		}
+
+		/**
+		*@private
+		*<p>获取对象的布局样式。</p>
+		*/
+		__proto.getLayout=function(){
+			this._layout===LayoutStyle.EMPTY && (this._layout=new LayoutStyle());
+			return this._layout;
+		}
+
+		/**
+		*@private
+		*<p>指定对象是否可使用布局。</p>
+		*<p>如果值为true,则此对象可以使用布局样式，否则不使用布局样式。</p>
+		*@param value 一个 Boolean 值，指定对象是否可使用布局。
+		*/
+		__proto._setLayoutEnabled=function(value){
+			if (this._layout && this._layout.enable !=value){
+				this._layout.enable=value;
+				this.on("added",this,this.onAdded);
+				this.on("removed",this,this.onRemoved);
+				if (this.parent){
+					this.onAdded();
+				}
+			}
+		}
+
+		/**
+		*对象从显示列表移除的事件侦听处理函数。
+		*/
+		__proto.onRemoved=function(){
+			this.parent.off("resize",this,this.onCompResize);
+		}
+
+		/**
+		*对象被添加到显示列表的事件侦听处理函数。
+		*/
+		__proto.onAdded=function(){
+			this.parent.on("resize",this,this.onCompResize);
+			this.resetLayoutX();
+			this.resetLayoutY();
+		}
+
+		/**
+		*父容器的 <code>Event.RESIZE</code> 事件侦听处理函数。
+		*/
+		__proto.onCompResize=function(){
+			if (this._layout && this._layout.enable){
+				this.resetLayoutX();
+				this.resetLayoutY();
+			}
+		}
+
+		/**
+		*<p>重置对象的 <code>X</code> 轴（水平方向）布局。</p>
+		*/
+		__proto.resetLayoutX=function(){
+			var layout=this._layout;
+			if (!isNaN(layout.anchorX))this.pivotX=layout.anchorX *this.width;
+			if (!this.layoutEnabled)return;
+			var parent=this.parent;
+			if (parent){
+				if (!isNaN(layout.centerX)){
+					this.x=Math.round((parent.width-this.displayWidth)*0.5+layout.centerX+this.pivotX *this.scaleX);
+					}else if (!isNaN(layout.left)){
+					this.x=Math.round(layout.left+this.pivotX *this.scaleX);
+					if (!isNaN(layout.right)){
+						this.width=(parent._width-layout.left-layout.right)/ (this.scaleX || 0.01);
+					}
+					}else if (!isNaN(layout.right)){
+					this.x=Math.round(parent.width-this.displayWidth-layout.right+this.pivotX *this.scaleX);
+				}
+			}
+		}
+
+		/**
+		*<p>重置对象的 <code>Y</code> 轴（垂直方向）布局。</p>
+		*/
+		__proto.resetLayoutY=function(){
+			var layout=this._layout;
+			if (!isNaN(layout.anchorY))this.pivotY=layout.anchorY *this.height;
+			if (!this.layoutEnabled)return;
+			var parent=this.parent;
+			if (parent){
+				if (!isNaN(layout.centerY)){
+					this.y=Math.round((parent.height-this.displayHeight)*0.5+layout.centerY+this.pivotY *this.scaleY);
+					}else if (!isNaN(layout.top)){
+					this.y=Math.round(layout.top+this.pivotY *this.scaleY);
+					if (!isNaN(layout.bottom)){
+						this.height=(parent._height-layout.top-layout.bottom)/ (this.scaleY || 0.01);
+					}
+					}else if (!isNaN(layout.bottom)){
+					this.y=Math.round(parent.height-this.displayHeight-layout.bottom+this.pivotY *this.scaleY);
+				}
+			}
+		}
+
+		/**
+		*对象的 <code>Event.MOUSE_OVER</code> 事件侦听处理函数。
+		*/
+		__proto.onMouseOver=function(e){
+			Laya.stage.event("showtip",this._toolTip);
+		}
+
+		/**
+		*对象的 <code>Event.MOUSE_OUT</code> 事件侦听处理函数。
+		*/
+		__proto.onMouseOut=function(e){
+			Laya.stage.event("hidetip",this._toolTip);
+		}
+
+		/**
+		*<p>对象的显示宽度（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'displayWidth',function(){
+			return this.width *this.scaleX;
+		});
+
+		/**
+		*<p>表示显示对象的宽度，以像素为单位。</p>
+		*<p><b>注：</b>当值为0时，宽度为自适应大小。</p>
+		*/
+		__getset(0,__proto,'width',function(){
+			if (this._width)return this._width;
+			return this.measureWidth;
+			},function(value){
+			if (this._width !=value){
+				this._width=value;
+				this.conchModel && this.conchModel.size(this._width,this._height);
+				this.callLater(this.changeSize);
+				if (this._layout.enable && (!isNaN(this._layout.centerX)|| !isNaN(this._layout.right)|| !isNaN(this._layout.anchorX)))this.resetLayoutX();
+			}
+		});
+
+		/**
+		*<p>显示对象的实际显示区域宽度（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'measureWidth',function(){
+			var max=0;
+			this.commitMeasure();
+			for (var i=this.numChildren-1;i >-1;i--){
+				var comp=this.getChildAt(i);
+				if (comp.visible){
+					max=Math.max(comp.x+comp.width *comp.scaleX,max);
+				}
+			}
+			return max;
+		});
+
+		/**
+		*<p>对象的显示高度（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'displayHeight',function(){
+			return this.height *this.scaleY;
+		});
+
+		/**
+		*<p>表示显示对象的高度，以像素为单位。</p>
+		*<p><b>注：</b>当值为0时，高度为自适应大小。</p>
+		*/
+		__getset(0,__proto,'height',function(){
+			if (this._height)return this._height;
+			return this.measureHeight;
+			},function(value){
+			if (this._height !=value){
+				this._height=value;
+				this.conchModel && this.conchModel.size(this._width,this._height);
+				this.callLater(this.changeSize);
+				if (this._layout.enable && (!isNaN(this._layout.centerY)|| !isNaN(this._layout.bottom)|| !isNaN(this._layout.anchorY)))this.resetLayoutY();
+			}
+		});
+
+		/**
+		*<p>数据赋值，通过对UI赋值来控制UI显示逻辑。</p>
+		*<p>简单赋值会更改组件的默认属性，使用大括号可以指定组件的任意属性进行赋值。</p>
+		*@example
+		//默认属性赋值
+		dataSource={label1:"改变了label",checkbox1:true};//(更改了label1的text属性值，更改checkbox1的selected属性)。
+		//任意属性赋值
+		dataSource={label2:{text:"改变了label",size:14},checkbox2:{selected:true,x:10}};
+		*/
+		__getset(0,__proto,'dataSource',function(){
+			return this._dataSource;
+			},function(value){
+			this._dataSource=value;
+			for (var prop in this._dataSource){
+				if (this.hasOwnProperty(prop)&& !((typeof (this[prop])=='function'))){
+					this[prop]=this._dataSource[prop];
+				}
+			}
+		});
+
+		/**@inheritDoc */
+		__getset(0,__proto,'scaleY',_super.prototype._$get_scaleY,function(value){
+			if (_super.prototype._$get_scaleY.call(this)!=value){
+				_super.prototype._$set_scaleY.call(this,value);
+				this.callLater(this.changeSize);
+				this._layout.enable && this.resetLayoutY();
+			}
+		});
+
+		/**
+		*<p>显示对象的实际显示区域高度（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'measureHeight',function(){
+			var max=0;
+			this.commitMeasure();
+			for (var i=this.numChildren-1;i >-1;i--){
+				var comp=this.getChildAt(i);
+				if (comp.visible){
+					max=Math.max(comp.y+comp.height *comp.scaleY,max);
+				}
+			}
+			return max;
+		});
+
+		/**@inheritDoc */
+		__getset(0,__proto,'scaleX',_super.prototype._$get_scaleX,function(value){
+			if (_super.prototype._$get_scaleX.call(this)!=value){
+				_super.prototype._$set_scaleX.call(this,value);
+				this.callLater(this.changeSize);
+				this._layout.enable && this.resetLayoutX();
+			}
+		});
+
+		/**
+		*<p>从组件顶边到其内容区域顶边之间的垂直距离（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'top',function(){
+			return this._layout.top;
+			},function(value){
+			if (value !=this._layout.top){
+				this.getLayout().top=value;
+				this._setLayoutEnabled(true);
+			}
+			this.resetLayoutY();
+		});
+
+		/**
+		*<p>从组件底边到其内容区域底边之间的垂直距离（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'bottom',function(){
+			return this._layout.bottom;
+			},function(value){
+			if (value !=this._layout.bottom){
+				this.getLayout().bottom=value;
+				this._setLayoutEnabled(true);
+			}
+			this.resetLayoutY();
+		});
+
+		/**
+		*<p>从组件左边到其内容区域左边之间的水平距离（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'left',function(){
+			return this._layout.left;
+			},function(value){
+			if (value !=this._layout.left){
+				this.getLayout().left=value;
+				this._setLayoutEnabled(true);
+			}
+			this.resetLayoutX();
+		});
+
+		/**
+		*<p>从组件右边到其内容区域右边之间的水平距离（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'right',function(){
+			return this._layout.right;
+			},function(value){
+			if (value !=this._layout.right){
+				this.getLayout().right=value;
+				this._setLayoutEnabled(true);
+			}
+			this.resetLayoutX();
+		});
+
+		/**
+		*<p>在父容器中，此对象的水平方向中轴线与父容器的水平方向中心线的距离（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'centerX',function(){
+			return this._layout.centerX;
+			},function(value){
+			if (value !=this._layout.centerX){
+				this.getLayout().centerX=value;
+				this._setLayoutEnabled(true);
+			}
+			this.resetLayoutX();
+		});
+
+		/**
+		*<p>在父容器中，此对象的垂直方向中轴线与父容器的垂直方向中心线的距离（以像素为单位）。</p>
+		*/
+		__getset(0,__proto,'centerY',function(){
+			return this._layout.centerY;
+			},function(value){
+			if (value !=this._layout.centerY){
+				this.getLayout().centerY=value;
+				this._setLayoutEnabled(true);
+			}
+			this.resetLayoutY();
+		});
+
+		/**X轴锚点，值为0-1*/
+		__getset(0,__proto,'anchorX',function(){
+			return this._layout.anchorX;
+			},function(value){
+			if (value !=this._layout.anchorX){
+				this.getLayout().anchorX=value;
+				this._setLayoutEnabled(true);
+			}
+			this.resetLayoutX();
+		});
+
+		/**Y轴锚点，值为0-1*/
+		__getset(0,__proto,'anchorY',function(){
+			return this._layout.anchorY;
+			},function(value){
+			if (value !=this._layout.anchorY){
+				this.getLayout().anchorY=value;
+				this._setLayoutEnabled(true);
+			}
+			this.resetLayoutY();
+		});
+
+		/**
+		*<p>对象的标签。</p>
+		*@internal 冗余字段，可以用来储存数据。
+		*/
+		__getset(0,__proto,'tag',function(){
+			return this._tag;
+			},function(value){
+			this._tag=value;
+		});
+
+		/**
+		*<p>鼠标悬停提示。</p>
+		*<p>可以赋值为文本 <code>String</code> 或函数 <code>Handler</code> ，用来实现自定义样式的鼠标提示和参数携带等。</p>
+		*@example
+		*private var _testTips:TestTipsUI=new TestTipsUI();
+		*private function testTips():void {
+			//简单鼠标提示
+			*btn2.toolTip="这里是鼠标提示&lt;b&gt;粗体&lt;/b&gt;&lt;br&gt;换行";
+			//自定义的鼠标提示
+			*btn1.toolTip=showTips1;
+			//带参数的自定义鼠标提示
+			*clip.toolTip=new Handler(this,showTips2,["clip"]);
+			*}
+		*private function showTips1():void {
+			*_testTips.label.text="这里是按钮["+btn1.label+"]";
+			*tip.addChild(_testTips);
+			*}
+		*private function showTips2(name:String):void {
+			*_testTips.label.text="这里是"+name;
+			*tip.addChild(_testTips);
+			*}
+		*/
+		__getset(0,__proto,'toolTip',function(){
+			return this._toolTip;
+			},function(value){
+			if (this._toolTip !=value){
+				this._toolTip=value;
+				if (value !=null){
+					this.on("mouseover",this,this.onMouseOver);
+					this.on("mouseout",this,this.onMouseOut);
+					}else {
+					this.off("mouseover",this,this.onMouseOver);
+					this.off("mouseout",this,this.onMouseOut);
+				}
+			}
+		});
+
+		/**
+		*XML 数据。
+		*/
+		__getset(0,__proto,'comXml',function(){
+			return this._comXml;
+			},function(value){
+			this._comXml=value;
+		});
+
+		/**是否变灰。*/
+		__getset(0,__proto,'gray',function(){
+			return this._gray;
+			},function(value){
+			if (value!==this._gray){
+				this._gray=value;
+				UIUtils.gray(this,value);
+			}
+		});
+
+		/**是否禁用页面，设置为true后，会变灰并且禁用鼠标。*/
+		__getset(0,__proto,'disabled',function(){
+			return this._disabled;
+			},function(value){
+			if (value!==this._disabled){
+				this.gray=this._disabled=value;
+				this.mouseEnabled=!value;
+			}
+		});
+
+		return Component;
 	})(Sprite)
 
 
@@ -24290,6 +25111,279 @@ var Laya=window.Laya=(function(window,document){
 	})(Text)
 
 
+	//class laya.ui.Label extends laya.ui.Component
+	var Label=(function(_super){
+		function Label(text){
+			this._tf=null;
+			Label.__super.call(this);
+			(text===void 0)&& (text="");
+			Font.defaultColor=Styles.labelColor;
+			this.text=text;
+		}
+
+		__class(Label,'laya.ui.Label',_super);
+		var __proto=Label.prototype;
+		/**@inheritDoc */
+		__proto.destroy=function(destroyChild){
+			(destroyChild===void 0)&& (destroyChild=true);
+			_super.prototype.destroy.call(this,destroyChild);
+			this._tf=null;
+		}
+
+		/**@inheritDoc */
+		__proto.createChildren=function(){
+			this.addChild(this._tf=new Text());
+		}
+
+		/**@copy laya.display.Text#changeText()
+		**/
+		__proto.changeText=function(text){
+			this._tf.changeText(text);
+		}
+
+		/**
+		*<p>边距信息</p>
+		*<p>"上边距，右边距，下边距 , 左边距（边距以像素为单位）"</p>
+		*@see laya.display.Text.padding
+		*/
+		__getset(0,__proto,'padding',function(){
+			return this._tf.padding.join(",");
+			},function(value){
+			this._tf.padding=UIUtils.fillArray(Styles.labelPadding,value,Number);
+		});
+
+		/**
+		*@copy laya.display.Text#bold
+		*/
+		__getset(0,__proto,'bold',function(){
+			return this._tf.bold;
+			},function(value){
+			this._tf.bold=value;
+		});
+
+		/**
+		*@copy laya.display.Text#align
+		*/
+		__getset(0,__proto,'align',function(){
+			return this._tf.align;
+			},function(value){
+			this._tf.align=value;
+		});
+
+		/**
+		*当前文本内容字符串。
+		*@see laya.display.Text.text
+		*/
+		__getset(0,__proto,'text',function(){
+			return this._tf.text;
+			},function(value){
+			if (this._tf.text !=value){
+				if(value)
+					value=UIUtils.adptString(value+"");
+				this._tf.text=value;
+				this.event("change");
+				if (!this._width || !this._height)this.onCompResize();
+			}
+		});
+
+		/**
+		*@copy laya.display.Text#italic
+		*/
+		__getset(0,__proto,'italic',function(){
+			return this._tf.italic;
+			},function(value){
+			this._tf.italic=value;
+		});
+
+		/**
+		*@copy laya.display.Text#wordWrap
+		*/
+		/**
+		*@copy laya.display.Text#wordWrap
+		*/
+		__getset(0,__proto,'wordWrap',function(){
+			return this._tf.wordWrap;
+			},function(value){
+			this._tf.wordWrap=value;
+		});
+
+		/**
+		*@copy laya.display.Text#font
+		*/
+		__getset(0,__proto,'font',function(){
+			return this._tf.font;
+			},function(value){
+			this._tf.font=value;
+		});
+
+		/**@inheritDoc */
+		__getset(0,__proto,'dataSource',_super.prototype._$get_dataSource,function(value){
+			this._dataSource=value;
+			if ((typeof value=='number')|| (typeof value=='string'))this.text=value+"";
+			else _super.prototype._$set_dataSource.call(this,value);
+		});
+
+		/**
+		*@copy laya.display.Text#color
+		*/
+		__getset(0,__proto,'color',function(){
+			return this._tf.color;
+			},function(value){
+			this._tf.color=value;
+		});
+
+		/**
+		*@copy laya.display.Text#valign
+		*/
+		__getset(0,__proto,'valign',function(){
+			return this._tf.valign;
+			},function(value){
+			this._tf.valign=value;
+		});
+
+		/**
+		*@copy laya.display.Text#leading
+		*/
+		__getset(0,__proto,'leading',function(){
+			return this._tf.leading;
+			},function(value){
+			this._tf.leading=value;
+		});
+
+		/**
+		*@copy laya.display.Text#fontSize
+		*/
+		__getset(0,__proto,'fontSize',function(){
+			return this._tf.fontSize;
+			},function(value){
+			this._tf.fontSize=value;
+		});
+
+		/**
+		*@copy laya.display.Text#bgColor
+		*/
+		__getset(0,__proto,'bgColor',function(){
+			return this._tf.bgColor
+			},function(value){
+			this._tf.bgColor=value;
+		});
+
+		/**
+		*@copy laya.display.Text#borderColor
+		*/
+		__getset(0,__proto,'borderColor',function(){
+			return this._tf.borderColor
+			},function(value){
+			this._tf.borderColor=value;
+		});
+
+		/**
+		*@copy laya.display.Text#stroke
+		*/
+		__getset(0,__proto,'stroke',function(){
+			return this._tf.stroke;
+			},function(value){
+			this._tf.stroke=value;
+		});
+
+		/**
+		*@copy laya.display.Text#strokeColor
+		*/
+		__getset(0,__proto,'strokeColor',function(){
+			return this._tf.strokeColor;
+			},function(value){
+			this._tf.strokeColor=value;
+		});
+
+		/**
+		*文本控件实体 <code>Text</code> 实例。
+		*/
+		__getset(0,__proto,'textField',function(){
+			return this._tf;
+		});
+
+		/**
+		*@inheritDoc
+		*/
+		__getset(0,__proto,'measureWidth',function(){
+			return this._tf.width;
+		});
+
+		/**
+		*@inheritDoc
+		*/
+		__getset(0,__proto,'measureHeight',function(){
+			return this._tf.height;
+		});
+
+		/**
+		*@inheritDoc
+		*/
+		/**
+		*@inheritDoc
+		*/
+		__getset(0,__proto,'width',function(){
+			if (this._width || this._tf.text)return _super.prototype._$get_width.call(this);
+			return 0;
+			},function(value){
+			_super.prototype._$set_width.call(this,value);
+			this._tf.width=value;
+		});
+
+		/**
+		*@inheritDoc
+		*/
+		/**
+		*@inheritDoc
+		*/
+		__getset(0,__proto,'height',function(){
+			if (this._height || this._tf.text)return _super.prototype._$get_height.call(this);
+			return 0;
+			},function(value){
+			_super.prototype._$set_height.call(this,value);
+			this._tf.height=value;
+		});
+
+		/**
+		*@copy laya.display.Text#overflow
+		*/
+		/**
+		*@copy laya.display.Text#overflow
+		*/
+		__getset(0,__proto,'overflow',function(){
+			return this._tf.overflow;
+			},function(value){
+			this._tf.overflow=value;
+		});
+
+		/**
+		*@copy laya.display.Text#underline
+		*/
+		/**
+		*@copy laya.display.Text#underline
+		*/
+		__getset(0,__proto,'underline',function(){
+			return this._tf.underline;
+			},function(value){
+			this._tf.underline=value;
+		});
+
+		/**
+		*@copy laya.display.Text#underlineColor
+		*/
+		/**
+		*@copy laya.display.Text#underlineColor
+		*/
+		__getset(0,__proto,'underlineColor',function(){
+			return this._tf.underlineColor;
+			},function(value){
+			this._tf.underlineColor=value;
+		});
+
+		return Label;
+	})(Component)
+
+
 	//class laya.webgl.shader.d2.Shader2X extends laya.webgl.shader.Shader
 	var Shader2X=(function(_super){
 		function Shader2X(vs,ps,saveName,nameMap){
@@ -24576,6 +25670,248 @@ var Laya=window.Laya=(function(window,document){
 
 		return VertexBuffer2D;
 	})(Buffer2D)
+
+
+	//class laya.ui.TextInput extends laya.ui.Label
+	var TextInput=(function(_super){
+		function TextInput(text){
+			this._bg=null;
+			this._skin=null;
+			TextInput.__super.call(this);
+			(text===void 0)&& (text="");
+			this.text=text;
+			this.skin=this.skin;
+		}
+
+		__class(TextInput,'laya.ui.TextInput',_super);
+		var __proto=TextInput.prototype;
+		/**@inheritDoc */
+		__proto.preinitialize=function(){
+			this.mouseEnabled=true;
+		}
+
+		/**@inheritDoc */
+		__proto.destroy=function(destroyChild){
+			(destroyChild===void 0)&& (destroyChild=true);
+			_super.prototype.destroy.call(this,destroyChild);
+			this._bg && this._bg.destroy();
+			this._bg=null;
+		}
+
+		/**@inheritDoc */
+		__proto.createChildren=function(){
+			this.addChild(this._tf=new Input());
+			this._tf.padding=Styles.inputLabelPadding;
+			this._tf.on("input",this,this._onInput);
+			this._tf.on("enter",this,this._onEnter);
+			this._tf.on("blur",this,this._onBlur);
+			this._tf.on("focus",this,this._onFocus);
+		}
+
+		/**
+		*@private
+		*/
+		__proto._onFocus=function(){
+			this.event("focus",this);
+		}
+
+		/**
+		*@private
+		*/
+		__proto._onBlur=function(){
+			this.event("blur",this);
+		}
+
+		/**
+		*@private
+		*/
+		__proto._onInput=function(){
+			this.event("input",this);
+		}
+
+		/**
+		*@private
+		*/
+		__proto._onEnter=function(){
+			this.event("enter",this);
+		}
+
+		/**@inheritDoc */
+		__proto.initialize=function(){
+			this.width=128;
+			this.height=22;
+		}
+
+		/**选中输入框内的文本。*/
+		__proto.select=function(){
+			(this._tf).select();
+		}
+
+		__proto.setSelection=function(startIndex,endIndex){
+			(this._tf).setSelection(startIndex,endIndex);
+		}
+
+		/**
+		*当前文本内容字符串。
+		*@see laya.display.Text.text
+		*/
+		__getset(0,__proto,'text',_super.prototype._$get_text,function(value){
+			if (this._tf.text !=value){
+				value=value+"";
+				this._tf.text=value;
+				this.event("change");
+			}
+		});
+
+		/**
+		*表示此对象包含的文本背景 <code>AutoBitmap</code> 组件实例。
+		*/
+		__getset(0,__proto,'bg',function(){
+			return this._bg;
+			},function(value){
+			this.graphics=this._bg=value;
+		});
+
+		/**
+		*设置原生input输入框的y坐标偏移。
+		*/
+		__getset(0,__proto,'inputElementYAdjuster',function(){
+			return (this._tf).inputElementYAdjuster;
+			},function(value){
+			(this._tf).inputElementYAdjuster=value;
+		});
+
+		/**
+		*<p>指示当前是否是文本域。</p>
+		*值为true表示当前是文本域，否则不是文本域。
+		*/
+		__getset(0,__proto,'multiline',function(){
+			return (this._tf).multiline;
+			},function(value){
+			(this._tf).multiline=value;
+		});
+
+		/**
+		*@copy laya.ui.Image#skin
+		*/
+		__getset(0,__proto,'skin',function(){
+			return this._skin;
+			},function(value){
+			if (this._skin !=value){
+				this._skin=value;
+				this._bg || (this.graphics=this._bg=new AutoBitmap());
+				this._bg.source=Loader.getRes(this._skin);
+				this._width && (this._bg.width=this._width);
+				this._height && (this._bg.height=this._height);
+			}
+		});
+
+		/**
+		*<p>当前实例的背景图（ <code>AutoBitmap</code> ）实例的有效缩放网格数据。</p>
+		*<p>数据格式："上边距,右边距,下边距,左边距,是否重复填充(值为0：不重复填充，1：重复填充)"，以逗号分隔。
+		*<ul><li>例如："4,4,4,4,1"</li></ul></p>
+		*@see laya.ui.AutoBitmap.sizeGrid
+		*/
+		__getset(0,__proto,'sizeGrid',function(){
+			return this._bg && this._bg.sizeGrid ? this._bg.sizeGrid.join(","):null;
+			},function(value){
+			this._bg || (this.graphics=this._bg=new AutoBitmap());
+			this._bg.sizeGrid=UIUtils.fillArray(Styles.defaultSizeGrid,value,Number);
+		});
+
+		/**
+		*设置原生input输入框的x坐标偏移。
+		*/
+		__getset(0,__proto,'inputElementXAdjuster',function(){
+			return (this._tf).inputElementXAdjuster;
+			},function(value){
+			(this._tf).inputElementXAdjuster=value;
+		});
+
+		/**@inheritDoc */
+		__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
+			_super.prototype._$set_width.call(this,value);
+			this._bg && (this._bg.width=value);
+		});
+
+		/**@inheritDoc */
+		__getset(0,__proto,'height',_super.prototype._$get_height,function(value){
+			_super.prototype._$set_height.call(this,value);
+			this._bg && (this._bg.height=value);
+		});
+
+		/**
+		*设置可编辑状态。
+		*/
+		__getset(0,__proto,'editable',function(){
+			return (this._tf).editable;
+			},function(value){
+			(this._tf).editable=value;
+		});
+
+		/**限制输入的字符。*/
+		__getset(0,__proto,'restrict',function(){
+			return (this._tf).restrict;
+			},function(pattern){
+			(this._tf).restrict=pattern;
+		});
+
+		/**
+		*@copy laya.display.Input#prompt
+		*/
+		__getset(0,__proto,'prompt',function(){
+			return (this._tf).prompt;
+			},function(value){
+			(this._tf).prompt=value;
+		});
+
+		/**
+		*@copy laya.display.Input#promptColor
+		*/
+		__getset(0,__proto,'promptColor',function(){
+			return (this._tf).promptColor;
+			},function(value){
+			(this._tf).promptColor=value;
+		});
+
+		/**
+		*@copy laya.display.Input#maxChars
+		*/
+		__getset(0,__proto,'maxChars',function(){
+			return (this._tf).maxChars;
+			},function(value){
+			(this._tf).maxChars=value;
+		});
+
+		/**
+		*@copy laya.display.Input#focus
+		*/
+		__getset(0,__proto,'focus',function(){
+			return (this._tf).focus;
+			},function(value){
+			(this._tf).focus=value;
+		});
+
+		/**
+		*@copy laya.display.Input#type
+		*/
+		__getset(0,__proto,'type',function(){
+			return (this._tf).type;
+			},function(value){
+			(this._tf).type=value;
+		});
+
+		/**
+		*@copy laya.display.Input#asPassword
+		*/
+		__getset(0,__proto,'asPassword',function(){
+			return (this._tf).asPassword;
+			},function(value){
+			(this._tf).asPassword=value;
+		});
+
+		return TextInput;
+	})(Label)
 
 
 	//class laya.webgl.resource.WebGLImage extends laya.resource.HTMLImage

@@ -334,10 +334,10 @@ package laya.display {
 		
 		/**
 		 * <p>指定显示对象是否缓存为静态图像，cacheAs时，子对象发生变化，会自动重新缓存，同时也可以手动调用reCache方法更新缓存。</p>
-		 * <p>建议把不经常变化的“复杂内容”缓存为静态图像，能极大提高渲染性能。cacheAs有"none"，"normal"和"bitmap"三个值可选。
+		 * <p>建议把不经常变化的“复杂内容”缓存为静态图像，能极大提高渲染性能。cacheAs有"none"，"normal"和"textBitmap"三个值可选。
 		 * <li>默认为"none"，不做任何缓存。</li>
 		 * <li>当值为"normal"时，canvas模式下进行画布缓存，webgl模式下进行命令缓存。</li>
-		 * <li>当值为"bitmap"时，canvas模式下进行依然是画布缓存，webgl模式下使用renderTarget缓存。</li></p>
+		 * <li>当值为"textBitmap"时，canvas模式下进行依然是画布缓存，webgl模式下使用renderTarget缓存。</li></p>
 		 * <p>webgl下renderTarget缓存模式缺点：会额外创建renderTarget对象，增加内存开销，缓存面积有最大2048限制，不断重绘时会增加CPU开销。优点：大幅减少drawcall，渲染性能最高。
 		 * webgl下命令缓存模式缺点：只会减少节点遍历及命令组织，不会减少drawcall数，性能中等。优点：没有额外内存开销，无需renderTarget支持。</p>
 		 */
@@ -354,7 +354,7 @@ package laya.display {
 				cacheCanvas.type = value;
 				cacheCanvas.reCache = true;
 				_renderType |= RenderSprite.CANVAS;
-				if (value == "bitmap") conchModel && conchModel.cacheAs(1);
+				if (value == "textBitmap") conchModel && conchModel.cacheAs(1);
 				_set$P("cacheForFilters", false);
 			} else {
 				if (_$P["hasFilter"]) {
@@ -1097,15 +1097,15 @@ package laya.display {
 			if (value && value.length > 0) {
 				if (!_getBit(Node.NOTICE_DISPLAY)) _setUpNoticeType(Node.NOTICE_DISPLAY);
 				if (!(Render.isWebGL && value.length == 1 && (value[0] is ColorFilter))) {
-					if (cacheAs != "bitmap") {
-						if (!Render.isConchNode) cacheAs = "bitmap";
+					if (cacheAs != "textBitmap") {
+						if (!Render.isConchNode) cacheAs = "textBitmap";
 						_set$P("cacheForFilters", true);
 					}
 					_set$P("hasFilter", true);
 				}
 			} else {
 				_set$P("hasFilter", false);
-				if (_$P["cacheForFilters"] && cacheAs == "bitmap") {
+				if (_$P["cacheForFilters"] && cacheAs == "textBitmap") {
 					cacheAs = "none";
 				}
 			}
@@ -1393,7 +1393,7 @@ package laya.display {
 			if (value && mask && mask._$P.maskParent) return;
 			if (value) {
 				//TODO:去掉关联
-				cacheAs = "bitmap";
+				cacheAs = "textBitmap";
 				_set$P("_mask", value);
 				value._set$P("maskParent", this);
 			} else {

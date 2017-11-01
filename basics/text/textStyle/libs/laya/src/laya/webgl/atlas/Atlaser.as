@@ -78,7 +78,7 @@ package laya.webgl.atlas {
 				_InAtlasWebGLImagesOffsetValue.push([offsetX, offsetY]);
 			}
 			//if (bitmap is  WebGLSubImage)//临时
-			//_atlasCanvas.texSubImage2DPixel(bitmap, offsetX,/* width, height, AtlasManager.BOARDER_TYPE_ALL, 1, 1*/ offsetY,bitmap.width,bitmap.height, bitmap.imageData);
+			//_atlasCanvas.texSubImage2DPixel(textBitmap, offsetX,/* width, height, AtlasManager.BOARDER_TYPE_ALL, 1, 1*/ offsetY,textBitmap.width,textBitmap.height, textBitmap.imageData);
 			//else
 			_atlasCanvas.texSubImage2D(offsetX,/* width, height, AtlasManager.BOARDER_TYPE_ALL, 1, 1*/ offsetY, mergeAtlasBitmap.atlasSource);
 			mergeAtlasBitmap.clearAtlasSource();

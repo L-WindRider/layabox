@@ -13,7 +13,7 @@ Project configuration:f:\github\layabox\basics\text\textStyle/.actionScriptPrope
 1,0.00,f:/github/layabox/basics/text/textStyle/libs/laya/src,0,Collect
 1,2.00,,0,read class message
 1,89.83,,0,Disable Flash3D f:/github/layabox/basics/text/textStyle/src/LayaSample.as
-12,89.83,f:/github/layabox/basics/text/textStyle/bin/h5/LayaSample.max.js,762663,
+12,89.83,f:/github/layabox/basics/text/textStyle/bin/h5/LayaSample.max.js,799737,
 11,89.83,f:/github/layabox/basics/text/textStyle/bin/h5/LayaSample.max.html,893,
 ******************************************************************************
 14,89.83,,0,
