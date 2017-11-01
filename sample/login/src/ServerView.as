@@ -1,5 +1,6 @@
 package 
 {
+	import laya.events.Event;
 	import laya.utils.Handler;
 	import ui.ServerListUI;
 	
@@ -32,6 +33,9 @@ package
 			this.list_server.selectHandler = Handler.create(this, this.onSelect, null, false);//4设置为false是因为默认为true(只执行一次)
 			this.list_server.selectedIndex = 0;//设置选择项为0，第一项
 			
+			//返回
+			this.btn_back.on(Event.CLICK, this, this.onback);
+			
 		}
 		private function onSelect(index:int):void
 		{
@@ -51,6 +55,13 @@ package
 			lastSelect = index;
 			trace(this.list_server.array);//打印数组
 			
+		}
+		private function onback():void
+		{
+			this.removeSelf();//删除自己
+			this.destroy();//销毁服务器页面
+			var view:LoginView = new LoginView();//创建一个界面
+			Laya.stage.addChild(view);
 		}
 	}
 
