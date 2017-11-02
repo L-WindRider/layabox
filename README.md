@@ -13,3 +13,8 @@ layabox学习
 >sample //示例
 >>login //一个登陆的demo 
           参考视频： https://ke.qq.com/course/184278
+>ui //图集动画、时间轴动画、骨骼动画制作
+      参考视频：https://ke.qq.com/course/237970
+>>atlas //图集打包
+>>animation //动画
+              图集自动打包

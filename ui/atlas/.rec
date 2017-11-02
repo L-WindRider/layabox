@@ -1,0 +1,35 @@
+D .
+R 8224EE86 .rec
+R 57E8908C role.atlas
+R A3B7ED78 role.png
+D role
+P 2FE7A165 attack0.png
+P 337CFD5D attack1.png
+P 84200768 attack2.png
+P 7D9AD35F attack3.png
+P 9C25ACC2 attack4.png
+P 28FE8C9A attack5.png
+P 5EBC7760 attack6.png
+P 0DD29078 die0.png
+P B01ABCCF die1.png
+P 8C374748 die2.png
+P 8F2C583C die3.png
+P FF9274A8 die4.png
+P 3ED85EF3 die5.png
+P 31767FF0 die6.png
+P 327FD17F die7.png
+P A6628A32 move0.png
+P 0478A06E move1.png
+P 8F71E1F6 move2.png
+P 52377954 move3.png
+P A48E83E5 move4.png
+P 90E05EFC move5.png
+P F58B55F9 move6.png
+P 63AA0B98 move7.png
+P DA042AAD stand0.png
+P 7BBDAFEE stand1.png
+P 2E343EE6 stand2.png
+P 3B2A1090 stand3.png
+P 8A0C85A8 stand4.png
+P 97C25AB0 stand5.png
+P 5EC5ACBC stand6.png
