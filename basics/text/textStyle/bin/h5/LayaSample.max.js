@@ -326,7 +326,7 @@ var Laya=window.Laya=(function(window,document){
 		__proto.createText=function(){
 			this.txt=new Text();
 			this.txt.text=
-			"Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！\n"+
+			"Layabox     是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！\n"+
 			"Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！\n"+
 			"Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！";
 			this.txt.borderColor="#FFFF00";
@@ -354,6 +354,7 @@ var Laya=window.Laya=(function(window,document){
 			t4.pos(10,110);
 			t4.y=400;
 			t4.on("mousedown",this,this.startScrollText);
+			t4.scrollX=100;
 		}
 
 		//开始滚动文本
@@ -378,6 +379,7 @@ var Laya=window.Laya=(function(window,document){
 			this.txt.scrollY+=this.prevY-nowY;
 			this.prevX=nowX;
 			this.prevY=nowY;
+			console.log(this.txt.scrollX);
 		}
 
 		/**********************textInput单行输入and多行输入********************************/
@@ -5439,7 +5441,7 @@ var Laya=window.Laya=(function(window,document){
 				this._next._fun.call(this._next,sprite,context,x,y);
 				return;
 			}
-			_cacheCanvas.type==='bitmap' ? (Stat.canvasBitmap++):(Stat.canvasNormal++);
+			_cacheCanvas.type==='textBitmap' ? (Stat.canvasBitmap++):(Stat.canvasNormal++);
 			var tx=_cacheCanvas.ctx;
 			if (sprite._needRepaint()|| !tx){
 				this._canvas_repaint(sprite,context,x,y);
@@ -5464,12 +5466,12 @@ var Laya=window.Laya=(function(window,document){
 			var top;
 			var tRec;
 			var tCacheType=_cacheCanvas.type;
-			tCacheType==='bitmap' ? (Stat.canvasBitmap++):(Stat.canvasNormal++);
+			tCacheType==='textBitmap' ? (Stat.canvasBitmap++):(Stat.canvasNormal++);
 			if (_repaint){
 				if (!_cacheCanvas._cacheRec)
 					_cacheCanvas._cacheRec=new Rectangle();
 				var w,h;
-				if (!Render.isWebGL || tCacheType==="bitmap"){
+				if (!Render.isWebGL || tCacheType==="textBitmap"){
 					tRec=sprite.getSelfBounds();
 					tRec.x=tRec.x-sprite.pivotX;
 					tRec.y=tRec.y-sprite.pivotY;
@@ -5515,7 +5517,7 @@ var Laya=window.Laya=(function(window,document){
 				h=tRec.height *scaleY;
 				left=tRec.x;
 				top=tRec.y;
-				if (Render.isWebGL && tCacheType==='bitmap' && (w > 2048 || h > 2048)){
+				if (Render.isWebGL && tCacheType==='textBitmap' && (w > 2048 || h > 2048)){
 					console.warn("cache textBitmap size larger than 2048,cache ignored");
 					if (_cacheCanvas.ctx){
 						Pool.recover("RenderContext",_cacheCanvas.ctx);
@@ -5532,7 +5534,7 @@ var Laya=window.Laya=(function(window,document){
 				canvas=tx.canvas;
 				canvas.clear();
 				(canvas.width !=w || canvas.height !=h)&& canvas.size(w,h);
-				if (tCacheType==='bitmap')canvas.context.asBitmap=true;
+				if (tCacheType==='textBitmap')canvas.context.asBitmap=true;
 				else if(tCacheType==='normal')canvas.context.asBitmap=false;
 				var t;
 				if (scaleX !=1 || scaleY !=1){
@@ -15561,7 +15563,7 @@ var Laya=window.Laya=(function(window,document){
 	//class laya.resource.Texture extends laya.events.EventDispatcher
 	var Texture=(function(_super){
 		function Texture(bitmap,uv){
-			//this.textBitmap=null;
+			//this.bitmap=null;
 			//this.uv=null;
 			this.offsetX=0;
 			this.offsetY=0;
@@ -19940,7 +19942,7 @@ var Laya=window.Laya=(function(window,document){
 				cacheCanvas.type=value;
 				cacheCanvas.reCache=true;
 				this._renderType |=0x10;
-				if (value=="bitmap")this.conchModel && this.conchModel.cacheAs(1);
+				if (value=="textBitmap")this.conchModel && this.conchModel.cacheAs(1);
 				this._set$P("cacheForFilters",false);
 				}else {
 				if (this._$P["hasFilter"]){
@@ -20343,15 +20345,15 @@ var Laya=window.Laya=(function(window,document){
 			if (value && value.length > 0){
 				if (!this._getBit(0x1))this._setUpNoticeType(0x1);
 				if (!(Render.isWebGL && value.length==1 && (((value[0])instanceof laya.filters.ColorFilter )))){
-					if (this.cacheAs !="bitmap"){
-						if (!Render.isConchNode)this.cacheAs="bitmap";
+					if (this.cacheAs !="textBitmap"){
+						if (!Render.isConchNode)this.cacheAs="textBitmap";
 						this._set$P("cacheForFilters",true);
 					}
 					this._set$P("hasFilter",true);
 				}
 				}else {
 				this._set$P("hasFilter",false);
-				if (this._$P["cacheForFilters"] && this.cacheAs=="bitmap"){
+				if (this._$P["cacheForFilters"] && this.cacheAs=="textBitmap"){
 					this.cacheAs="none";
 				}
 			}
@@ -20374,7 +20376,7 @@ var Laya=window.Laya=(function(window,document){
 			},function(value){
 			if (value && this.mask && this.mask._$P.maskParent)return;
 			if (value){
-				this.cacheAs="bitmap";
+				this.cacheAs="textBitmap";
 				this._set$P("_mask",value);
 				value._set$P("maskParent",this);
 				}else {

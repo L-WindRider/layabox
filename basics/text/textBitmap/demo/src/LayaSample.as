@@ -14,7 +14,7 @@
 			Laya.init(550, 400);
 			mBitmapFont = new BitmapFont();
 			//这里不需要扩展名，外部保证fnt和png文件同名
-			mBitmapFont.loadFont("textBitmap/test.fnt",new Handler(this,onLoaden));
+			mBitmapFont.loadFont("bitmap/test.fnt",new Handler(this,onLoaden));
 		}
 		private function onLoaden():void{
 			init();

@@ -45,7 +45,7 @@
         private function createText():Text{
 			txt = new Text();
 			txt.text =
-			 "Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！\n" +
+			 "Layabox     是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！\n" +
              "Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！\n" +
              "Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！"; 
 			txt.borderColor = "#FFFF00";
@@ -78,6 +78,7 @@
 			t4.pos(10, 110);
 			t4.y = 400;//设置 t4 对象的属性 y 的值，用于控制 t4 对象的显示位置。
 			t4.on(Event.MOUSE_DOWN, this, startScrollText);
+			t4.scrollX=100;
 		}
 		//开始滚动文本
 		private function startScrollText(e:Event):void{
@@ -100,6 +101,7 @@
             txt.scrollY += prevY - nowY;
             prevX = nowX;
             prevY = nowY;
+			trace(txt.scrollX);
 		}
 /**********************textInput单行输入and多行输入********************************/
 

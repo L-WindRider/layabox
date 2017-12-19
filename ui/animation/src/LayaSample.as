@@ -1,22 +1,37 @@
 ﻿package {
 	import laya.display.Animation;
+	import laya.display.Stage;
 	import laya.maths.Rectangle;
+	import laya.net.Loader;
 	import laya.utils.Handler;
+	import view.index;
 	public class LayaSample {
 		
-		public var roleAni:Animation;
+		//public var roleAni:Animation;
 		
 		public function LayaSample() {
 			//初始化引擎
-			Laya.init(1136, 640);
-			Laya.stage.bgColor = "#CCCCCC";
+			Laya.init(750, 750);
+			Laya.stage.scaleMode = Stage.SCALE_NOSCALE;//不进行缩放
+			Laya.stage.alignH = Stage.ALIGN_CENTER;//水平居中对齐
+			Laya.stage.alignV = Stage.ALIGN_MIDDLE;//垂直居中对齐
+			//Laya.stage.bgColor = "#CCCCCC";//背景设置
+			var resArray:Array = [{url: "res/atlas/comp.atlas", type: Loader.ATLAS}];
+			Laya.loader.load(resArray, Handler.create(this, this.onIndex));
 			
-			//实例化动画
+			/*//实例化动画
 			roleAni = new Animation();
-			roleAni.loadAtlas("res/atlas/role.atlas",Handler.create(this,this.onComplete));
+			roleAni.loadAtlas("res/atlas/role.atlas",Handler.create(this,this.onComplete));*/
 			
 		}
-		private function onComplete():void
+		
+		private function onIndex():void
+		{
+			var view:index = new index();
+			Laya.stage.addChild(view);
+		}
+		
+		/*private function onComplete():void
 		{
 			Laya.stage.addChild(roleAni);//动画的加载
 			//roleAni.play();//动画播放--播放所有动画
@@ -34,7 +49,7 @@
 			//动画实例创建
 			roleAni.loadImages(createUrls(7, "stand"), "stand");//传值进去，取名为stand
 			roleAni.loadImages(createUrls(8, "move"), "move");//传值进去，取名为move
-			//Animation创建
+			//类方法，静态方法创建动画
 			Animation.createFrames(createUrls(7, "attack"), "attack");//传值进去，取名为attack
 			Animation.createFrames(createUrls(8, "die"), "die");//传值进去，取名为die
 			//播放动画
@@ -48,6 +63,7 @@
 				arr.push("role/"+action+i+".png");//把所有的资源都放到数组里面
 			}
 			return arr;
-		}
+		}*/
+		
 	}
 }

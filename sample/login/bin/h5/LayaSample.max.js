@@ -34462,6 +34462,10 @@ var Laya=window.Laya=(function(window,document){
 	})(Dialog)
 
 
+	/**
+	*...
+	*@author heheda
+	*/
 	//class ServerView extends ui.ServerListUI
 	var ServerView=(function(_super){
 		function ServerView(){
@@ -34481,7 +34485,6 @@ var Laya=window.Laya=(function(window,document){
 			this.list_server.scrollBar.elasticBackTime=200;
 			this.list_server.scrollBar.hide=true;
 			this.list_server.selectHandler=Handler.create(this,this.onSelect,null,false);
-			this.list_server.selectedIndex=0;
 			this.btn_back.on("click",this,this.onback);
 		}
 
