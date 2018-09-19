@@ -9,9 +9,10 @@ package ui {
 		public var btn:Button;
 		public var qwe2:TextInput;
 		public var btnDel:Button;
-		public var img:Image;
+		public var imgBox:Box;
+		public var imgText:Label;
 
-		public static var uiView:Object =/*[STATIC SAFE]*/{"type":"View","props":{"width":1830,"height":1080},"child":[{"type":"Image","props":{"y":221,"x":25,"var":"qwer","skin":"Screensaver/8.jpg"}},{"type":"Box","props":{"y":128,"x":36},"child":[{"type":"Label","props":{"var":"qwe","text":"fvgdfhbdgffd","skin":"Screensaver/8.jpg","label":"label"}}]},{"type":"Button","props":{"y":587,"x":54,"var":"btn","skin":"comp/btn_choose.png","label":"label"}},{"type":"Box","props":{"y":47,"x":36},"child":[{"type":"TextInput","props":{"width":216,"var":"qwe2","skin":"Screensaver/8.jpg","label":"label","height":71}}]},{"type":"Button","props":{"y":700,"x":49,"var":"btnDel","skin":"comp/btn_choose.png","label":"label"}},{"type":"Image","props":{"y":123,"x":380,"var":"img","skin":"comp/btn_choose.png"}}]};
+		public static var uiView:Object =/*[STATIC SAFE]*/{"type":"View","props":{"width":1830,"height":1080},"child":[{"type":"Box","props":{"y":47,"x":25,"visible":false},"child":[{"type":"Image","props":{"y":174,"var":"qwer","skin":"Screensaver/8.jpg"}},{"type":"Box","props":{"y":81,"x":11},"child":[{"type":"Label","props":{"var":"qwe","text":"fvgdfhbdgffd","skin":"Screensaver/8.jpg","label":"label"}}]},{"type":"Button","props":{"y":540,"x":29,"var":"btn","skin":"comp/btn_choose.png","label":"label"}},{"type":"Box","props":{"x":11},"child":[{"type":"TextInput","props":{"width":216,"var":"qwe2","skin":"Screensaver/8.jpg","label":"label","height":71}}]},{"type":"Button","props":{"y":653,"x":24,"var":"btnDel","skin":"comp/btn_choose.png","label":"label"}}]},{"type":"Box","props":{"y":142,"x":139,"var":"imgBox"},"child":[{"type":"Label","props":{"y":92,"x":34,"width":81,"var":"imgText","text":"555","height":35,"fontSize":36,"color":"#ffffff"}},{"type":"Image","props":{"y":59,"x":1,"skin":"comp/img_blank.png"}},{"type":"Image","props":{"y":134,"x":10,"skin":"comp/img_blank.png"}}]}]};
 		override protected function createChildren():void {
 			super.createChildren();
 			createView(uiView);
